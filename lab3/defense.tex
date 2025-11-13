@@ -108,12 +108,12 @@ $$
     \cos{x}\\ x^3-\cos{\left( x^4 \right)}\\ \sin{\left( 2x+9 \right)}
 \end{bmatrix}^T\begin{bmatrix}
     \theta_1\\ \theta_2\\ \theta_3
-\end{bmatrix}+\cos{\left( x^6 \right)}+3u=f(x)\theta+d(x)+3u,
+\end{bmatrix}+\cos{\left( x^6 \right)}+3u=f(x)^T\theta+d(x)+3u,
 $$
 $$
 f(x)=\begin{bmatrix}
     f_1(x)\\f_2(x)\\f_3(x)
-\end{bmatrix}^T,\ \theta=\begin{bmatrix}
+\end{bmatrix},\ \theta=\begin{bmatrix}
     \theta_1\\ \theta_2\\ \theta_3
 \end{bmatrix},\ d(x)=\cos{\left( x^6 \right)}
 $$
@@ -131,16 +131,16 @@ $$
     &\left.+\theta_3\sin{\left(2x+9\right)}+\theta_2x^3+\cos{\left( x^6 \right)}+3u \right)=\\
     =&-\lambda x_m+\lambda g-\theta_1\cos{x}-\theta_2\left( x^3-\cos{\left( x^4 \right)} \right)+\\
     &-\theta_3\sin{\left(2x+9\right)}-\cos{\left( x^6 \right)}-3u=\\
-    =&-\lambda x_m+\lambda g-f(x)\theta-d(x)-3u
+    =&-\lambda x_m+\lambda g-f(x)^T\theta-d(x)-3u
 \end{align*}
 
 
 Подставим $x_m=x+\varepsilon$ в $\dot{\varepsilon}$:
 $$
-\dot{\varepsilon}=-\lambda \left( x+\varepsilon \right)+\lambda g-f(x)\theta-d(x)-3u,
+\dot{\varepsilon}=-\lambda \left( x+\varepsilon \right)+\lambda g-f(x)^T\theta-d(x)-3u,
 $$
 $$
-\dot{\varepsilon}=-\lambda\varepsilon-\left( \lambda x-\lambda g+f(x)\theta+d(x)+3u \right)
+\dot{\varepsilon}=-\lambda\varepsilon-\left( \lambda x-\lambda g+f(x)^T\theta+d(x)+3u \right)
 $$
 
 
@@ -153,7 +153,7 @@ $$
 Зададим такой закон управления, чтобы часть
 выражения $\dot{\varepsilon}$ в скобках обнулилась:
 $$
-3u=-\lambda x+\lambda g-f(x)\theta-d(x)\Rightarrow u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)\theta-d(x) \right)
+3u=-\lambda x+\lambda g-f(x)^T\theta-d(x)\Rightarrow u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)^T\theta-d(x) \right)
 $$
 
 
@@ -167,7 +167,7 @@ $$
 
 Тогда, адаптивный закон управления:
 $$
-u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)\hat{\theta}-d(x) \right)
+u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)^T\hat{\theta}-d(x) \right)
 $$
 
 
@@ -179,13 +179,13 @@ $$
 
 Подставим $u$ в $\dot{x}$:
 $$
-\dot{x}=f(x)\theta+d(x)+\left( -\lambda x+\lambda g-f(x)\hat{\theta}-d(x) \right)=-\lambda x+\lambda g+f(x)\tilde{\theta}
+\dot{x}=f(x)^T\theta+d(x)+\left( -\lambda x+\lambda g-f(x)^T\hat{\theta}-d(x) \right)=-\lambda x+\lambda g+f(x)^T\tilde{\theta}
 $$
 
 
 Тогда:
 $$
-\dot{\varepsilon}=\dot{x}_m-\dot{x}=-\lambda x_m+\lambda g-\left( -\lambda x+\lambda g+f(x)\tilde{\theta} \right)=-\lambda \varepsilon -f(x)\tilde{\theta}
+\dot{\varepsilon}=\dot{x}_m-\dot{x}=-\lambda x_m+\lambda g-\left( -\lambda x+\lambda g+f(x)^T\tilde{\theta} \right)=-\lambda \varepsilon -f(x)^T\tilde{\theta}
 $$
 
 
@@ -215,19 +215,19 @@ $$
 
 Подставим $\dot{\varepsilon}$ и $\dot{\tilde{\theta}}$ в $\dot{V}$:
 $$
-\dot{V}=\varepsilon\left( -\lambda\varepsilon-f(x)\tilde{\theta} \right)-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}=-\lambda\varepsilon^2-\varepsilon f(x)\tilde{\theta}-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}
+\dot{V}=\varepsilon\left( -\lambda\varepsilon-f(x)^T\tilde{\theta} \right)-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}=-\lambda\varepsilon^2-\varepsilon f(x)^T\tilde{\theta}-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}
 $$
 
 
-Так как $\varepsilon f(x)\tilde{\theta}=\tilde{\theta}^T\left( \varepsilon f(x)^T \right)$:
+Так как $\varepsilon f(x)^T\tilde{\theta}=\tilde{\theta}^T\left( \varepsilon f(x)\right)$:
 $$
-\dot{V}=-\lambda\varepsilon^2-\tilde{\theta}^T\left( \varepsilon f(x)^T+P^{-1}\dot{\hat{\theta}} \right)
+\dot{V}=-\lambda\varepsilon^2-\tilde{\theta}^T\left( \varepsilon f(x)+P^{-1}\dot{\hat{\theta}} \right)
 $$
 
 
 Для $\dot{V}\leq-\lambda\varepsilon^2\leq0$ достаточно:
 $$
-\varepsilon f(x)^T+P^{-1}\dot{\hat{\theta}}=0\Rightarrow \dot{\hat{\theta}}=-P\varepsilon f(x)^T
+\varepsilon f(x)+P^{-1}\dot{\hat{\theta}}=0\Rightarrow \dot{\hat{\theta}}=-P\varepsilon f(x)
 $$
 
 
@@ -329,4 +329,148 @@ $$
     x_2\\ \theta^Tf(x)
 \end{bmatrix}-B_dd(x)-Bu
 $$
+
+
+Цель:
+$$
+\dot{e}=A_me
+$$
+
+
+Тогда:
+$$
+Bu=b_mg+A_mx-\begin{bmatrix}
+    x_2\\ \theta^Tf(x)
+\end{bmatrix}-B_dd(x)
+$$
+
+
+Введем матрицы:
+$$
+A_m=\begin{bmatrix}
+    0&1\\ a_{m_{21}}&a_{m_{22}}
+\end{bmatrix},\ b_m=\begin{bmatrix}
+    0\\ b_{m_0}
+\end{bmatrix}
+$$
+
+
+Итого:
+$$
+6u=a_{m_{21}}x_{1}+a_{m_{22}}x_{2}+b_{m_0}g-\theta^Tf(x)-d(x),
+$$
+$$
+u=\frac{1}{6}\left( a_{m_{21}}x_{1}+a_{m_{22}}x_{2}+b_{m_0}g-\theta^Tf(x)-d(x) \right)
+$$
+
+
+Так как $\theta$ неизвестна:
+$$
+\hat{\theta}=\begin{bmatrix}
+    \hat{\theta}_1\\ \hat{\theta}_2\\ \hat{\theta}_3
+\end{bmatrix},\ \tilde{\theta}=\theta-\hat{\theta}
+$$
+
+
+Управление:
+$$
+u=\frac{1}{6}\left( a_{m_{21}}x_{1}+a_{m_{22}}x_{2}+b_{m_0}g-\hat{\theta}^Tf(x)-d(x) \right)
+$$
+
+
+Подставим в $\dot{e}$:
+$$
+\begin{cases}
+    \dot{e}_1=e_2,\\
+    \dot{e}_2=a_{m_{21}}e_{1}+a_{m_{22}}e_{2}-\theta^Tf(x)+\hat{\theta}^Tf(x)
+\end{cases}
+$$
+
+
+Так как $-\left( \theta^T-\hat{\theta}^T \right)f(x)=-\tilde{\theta}^Tf(x)$:
+$$
+\dot{e}=A_me-B\tilde{\theta}^Tf(x)
+$$
+
+
+Функция Ляпунова:
+$$
+V(e,\tilde{\theta})=0.5e^TP_1e+0.5\tilde{\theta}^TP_2^{-1}\tilde{\theta},
+$$
+где $P_1=P_1^T\succ0$ -- решение уравнения Ляпунова:
+$$
+A_m^TP_1+P_1A_m=-Q,\ Q=Q^T\succ0,
+$$
+$P_2$ -- диагональная матрица скоростей адаптации:
+$$
+P_2=\begin{bmatrix}
+    p_1&0&0\\0&p_2&0\\0&0&p_3
+\end{bmatrix},\ p_i>0
+$$
+
+
+Ее производная:
+$$
+\dot{V}=e^TP_1\dot{e}+\tilde{\theta}^TP_2^{-1}\dot{\tilde{\theta}}
+$$
+
+
+Подставим $\dot{e}$:
+$$
+\dot{V}=e^TP_1\left( A_me-B\tilde{\theta}^Tf(x) \right)+\tilde{\theta}^TP_2^{-1}\dot{\tilde{\theta}}=
+e^TP_1A_me-e^TP_1B\tilde{\theta}^Tf(x)+\tilde{\theta}^TP_2^{-1}\dot{\tilde{\theta}}
+$$
+
+
+Рассмотрим первый член:
+$$
+e^TP_1A_me=0.5e^T\left( P_1A_m+A_m^TP_1 \right)e=-0.5e^TQe
+$$
+
+
+Рассмотрим второй член:
+$$
+-e^TP_1B\tilde{\theta}^Tf(x)=-\tilde{\theta}^T\left( e^TP_1B \right)f(x)
+$$
+
+
+Тогда:
+$$
+\dot{V}=-0.5e^TQe-\tilde{\theta}^T\left( e^TP_1B \right)f(x)+\tilde{\theta}^TP_2^{-1}\dot{\tilde{\theta}}
+$$
+
+
+$\dot{\tilde{\theta}}=-\dot{\hat{\theta}}$, т.к. $\theta=const.$:
+$$
+\dot{V}=-0.5e^TQe-\tilde{\theta}^T\left( e^TP_1B \right)f(x)-\tilde{\theta}^TP_2^{-1}\dot{\hat{\theta}},
+$$
+$$
+\dot{V}=-0.5e^TQe-\tilde{\theta}^T\left(  \left( e^TP_1B \right)f(x) +P_2^{-1}\dot{\hat{\theta}}\right)
+$$
+
+
+Для $\dot{V}=-0.5e^TQe\leq0$ достаточно:
+$$
+\left( e^TP_1B \right)f(x) +P_2^{-1}\dot{\hat{\theta}}=0,
+$$
+$$
+\dot{\hat{\theta}}=-P_2\left( e^TP_1B \right)f(x)
+$$
+
+
+То есть:
+$$
+\begin{cases}
+    \dot{\hat{\theta}}_1=-p_1\left( e^TP_1B \right)\cos{\left( x_1^2-x_2^5 \right)},\\
+    \dot{\hat{\theta}}_2=-p_2\left( e^TP_1B \right)\left( \sin{\left( 6x_1^2-7x_2 \right)}-x_2^5 \right),\\
+    \dot{\hat{\theta}}_3=-p_3\left( e^TP_1B \right)\sin{\left( x_2^2 \right)}
+\end{cases}
+$$
+
+
+Закон управления:
+\begin{align*}
+    u=\frac{1}{6}&\left( a_{m_{21}}x_{1}+a_{m_{22}}x_{2}+b_{m_0}g-\theta_1\cos{\left( x_1^2-x_2^5 \right)}+\right.\\
+    &\left.-\theta_2\left(\sin{\left( 6x_1^2-7x_2 \right)}-x_2^5\right)-\theta_3\sin{\left( x_2^2 \right)}-\cos{x_3} \right)
+\end{align*}
 \end{document}
