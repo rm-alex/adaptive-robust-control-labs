@@ -1,0 +1,332 @@
+\documentclass[a4paper,14pt]{extarticle}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, russian]{babel}
+
+\usepackage[left=30mm, right=10mm, top=20mm, bottom=20mm]{geometry}
+
+\usepackage{tempora}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{titlesec}
+\titleformat{\section}[block]{\bfseries\centering\MakeUppercase}{\thesection.}{1em}{}
+\titleformat{\subsection}[block]{\bfseries}{\thesubsection.}{1em}{}
+\titleformat{\subsubsection}[block]{\bfseries}{\thesubsubsection.}{1em}{}
+
+\renewcommand{\contentsname}{\hfill \textbf{СОДЕРЖАНИЕ} \hfill\null}
+
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usepackage{cmap}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{LightGray}{gray}{0.7}
+
+\lstdefinestyle{code}{
+    language=Python, % change if needed
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    numberstyle=\small\color{LightGray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    rulecolor=\color{LightGray},
+    linewidth=\linewidth,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{violet},
+    escapeinside={\%*}{*)},
+    xleftmargin=10pt,
+    xrightmargin=10pt,
+    framexleftmargin=0pt,
+    framexrightmargin=0pt
+}
+\lstset{style=code}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={def},
+    pdfauthor={Rumyantsev Alexey},
+    pdfsubject={control},
+    pdfkeywords={LaTeX, PDF},
+    pdfpagemode=FullScreen,
+}
+
+\graphicspath{{src/images/}}
+
+\begin{document}
+\section{Задание 1}
+\subsection{Условие}
+Решить задачу адаптивного слежения для объекта вида
+(вывести аналитически выражения закона управления и алгоритма адаптации):
+$$
+\dot{x}=\theta_1\cos{x}-\theta_2\cos{\left( x^4 \right)}+\theta_3\sin{\left(2x+9\right)}+\theta_2x^3+\cos{\left( x^6 \right)}+3u,
+$$
+где $\theta_i$ -- неизвестный параметр. Цель управления заключается
+в компенсации неопределенности $\theta_i$ и обеспечении следующего
+целевого равенства:
+$$
+\lim\limits_{t\to\infty}\left( x_m(t)-x(t) \right)=\lim\limits_{t\to\infty}\varepsilon(t)=0,
+$$
+где $\varepsilon=x_m-x$ -- ошибка управления,
+$x_m$ -- эталонный сигнал, являющийся выходом
+динамической модели (эталонной модели):
+$$
+\dot{x}_m=-\lambda x_m+\lambda g,
+$$
+где $g$ -- сигнал задания, $\lambda>0$ -- параметр,
+задающий время переходного процесса.
+
+
+\subsection{Решение}
+Запишем уравнение объекта в регрессионной форме:
+$$
+\dot{x}=\begin{bmatrix}
+    \cos{x}\\ x^3-\cos{\left( x^4 \right)}\\ \sin{\left( 2x+9 \right)}
+\end{bmatrix}^T\begin{bmatrix}
+    \theta_1\\ \theta_2\\ \theta_3
+\end{bmatrix}+\cos{\left( x^6 \right)}+3u=f(x)\theta+d(x)+3u,
+$$
+$$
+f(x)=\begin{bmatrix}
+    f_1(x)\\f_2(x)\\f_3(x)
+\end{bmatrix}^T,\ \theta=\begin{bmatrix}
+    \theta_1\\ \theta_2\\ \theta_3
+\end{bmatrix},\ d(x)=\cos{\left( x^6 \right)}
+$$
+
+
+Ошибка слежения:
+$$
+\varepsilon(t)=x_m(t)-x(t)\Rightarrow\dot{\varepsilon}=\dot{x}_m-\dot{x}
+$$
+
+
+Подставим $\dot{x}_m$ и $\dot{x}$:
+\begin{align*}
+    \dot{\varepsilon}=&-\lambda x_m+\lambda g -\left( \theta_1\cos{x}-\theta_2\cos{\left( x^4 \right)}+\right.\\
+    &\left.+\theta_3\sin{\left(2x+9\right)}+\theta_2x^3+\cos{\left( x^6 \right)}+3u \right)=\\
+    =&-\lambda x_m+\lambda g-\theta_1\cos{x}-\theta_2\left( x^3-\cos{\left( x^4 \right)} \right)+\\
+    &-\theta_3\sin{\left(2x+9\right)}-\cos{\left( x^6 \right)}-3u=\\
+    =&-\lambda x_m+\lambda g-f(x)\theta-d(x)-3u
+\end{align*}
+
+
+Подставим $x_m=x+\varepsilon$ в $\dot{\varepsilon}$:
+$$
+\dot{\varepsilon}=-\lambda \left( x+\varepsilon \right)+\lambda g-f(x)\theta-d(x)-3u,
+$$
+$$
+\dot{\varepsilon}=-\lambda\varepsilon-\left( \lambda x-\lambda g+f(x)\theta+d(x)+3u \right)
+$$
+
+
+Желаемая динамика ошибки $\varepsilon\to0$:
+$$
+\dot{\varepsilon}=-k\varepsilon,\ k>0
+$$
+
+
+Зададим такой закон управления, чтобы часть
+выражения $\dot{\varepsilon}$ в скобках обнулилась:
+$$
+3u=-\lambda x+\lambda g-f(x)\theta-d(x)\Rightarrow u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)\theta-d(x) \right)
+$$
+
+
+Так как $\theta$ неизвестна, зададим:
+$$
+\hat{\theta}=\begin{bmatrix}
+    \hat{\theta}_1\\ \hat{\theta}_2\\ \hat{\theta}_3
+\end{bmatrix}
+$$
+
+
+Тогда, адаптивный закон управления:
+$$
+u=\frac{1}{3}\left( -\lambda x+\lambda g-f(x)\hat{\theta}-d(x) \right)
+$$
+
+
+Определим вектор ошибки параметров:
+$$
+\tilde{\theta}=\theta-\hat{\theta}
+$$
+
+
+Подставим $u$ в $\dot{x}$:
+$$
+\dot{x}=f(x)\theta+d(x)+\left( -\lambda x+\lambda g-f(x)\hat{\theta}-d(x) \right)=-\lambda x+\lambda g+f(x)\tilde{\theta}
+$$
+
+
+Тогда:
+$$
+\dot{\varepsilon}=\dot{x}_m-\dot{x}=-\lambda x_m+\lambda g-\left( -\lambda x+\lambda g+f(x)\tilde{\theta} \right)=-\lambda \varepsilon -f(x)\tilde{\theta}
+$$
+
+
+Квадратичная функция Ляпунова:
+$$
+V=0.5\varepsilon^2+0.5\tilde{\theta}^TP^{-1}\tilde{\theta},
+$$
+где $P=P^T\succ0$ -- матрица скорости адаптации:
+$$
+P=\begin{bmatrix}
+    p_1&0&0\\ 0&p_2&0\\0&0&p_3
+\end{bmatrix},\ p_i>0
+$$
+
+
+Производная функции Ляпунова:
+$$
+\dot{V}=\varepsilon\dot{\varepsilon}+\tilde{\theta}^TP^{-1}\dot{\tilde{\theta}}
+$$
+
+
+Так как $\theta=const.$:
+$$
+\dot{\tilde{\theta}}=0-\dot{\hat{\theta}}=-\dot{\hat{\theta}}
+$$
+
+
+Подставим $\dot{\varepsilon}$ и $\dot{\tilde{\theta}}$ в $\dot{V}$:
+$$
+\dot{V}=\varepsilon\left( -\lambda\varepsilon-f(x)\tilde{\theta} \right)-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}=-\lambda\varepsilon^2-\varepsilon f(x)\tilde{\theta}-\tilde{\theta}^TP^{-1}\dot{\hat{\theta}}
+$$
+
+
+Так как $\varepsilon f(x)\tilde{\theta}=\tilde{\theta}^T\left( \varepsilon f(x)^T \right)$:
+$$
+\dot{V}=-\lambda\varepsilon^2-\tilde{\theta}^T\left( \varepsilon f(x)^T+P^{-1}\dot{\hat{\theta}} \right)
+$$
+
+
+Для $\dot{V}\leq-\lambda\varepsilon^2\leq0$ достаточно:
+$$
+\varepsilon f(x)^T+P^{-1}\dot{\hat{\theta}}=0\Rightarrow \dot{\hat{\theta}}=-P\varepsilon f(x)^T
+$$
+
+
+Тогда, алгоритм адаптации:
+$$
+\begin{cases}
+    \dot{\hat{\theta}}_1=-p_1\varepsilon\cos{x},\\
+    \dot{\hat{\theta}}_2=-p_2\varepsilon\left( x^3-\cos{\left( x^4 \right)} \right),\\
+    \dot{\hat{\theta}}_3=-p_3\varepsilon\sin{\left( 2x+9 \right)}
+\end{cases}
+$$
+
+
+Закон управления:
+$$
+u=\frac{1}{3}\left( -\lambda x+\lambda g -\hat{\theta}_1\cos{x}-\hat{\theta}_2\left( x^3-\cos{\left( x^4 \right)} \right)-\hat{\theta}_3\sin{\left( 2x+9 \right)}-\cos{\left( x^6 \right)} \right)
+$$
+
+
+\section{Задание 2}
+\subsection{Условие}
+Решить задачу адаптивного управления
+(вывести аналитически выражения закона управления и алгоритма адаптации)
+для объекта:
+$$
+\begin{cases}
+    \dot{x}_1=&x_2,\\
+    \dot{x}_2=&\theta_1\cos{\left( x_1^2-x_2^5 \right)}+\theta_2\sin{\left( 6x_1^2-7x_2 \right)}+\\
+    &+\theta_3\sin{\left( x_2^2 \right)}-\theta_2x_2^5+\cos{x_3}+6u,
+\end{cases}
+$$
+где $\theta_i$ -- неизвестные коэффициенты. Цель управления задается
+равенством:
+$$
+\lim\limits_{t\to\infty}||e(t)||=0,
+$$
+где $e=x_m-x$ -- вектор ошибки управления,
+$x_m\in\mathbb{R}^n$ -- вектор, генерируемый эталонной моделью:
+$$
+\dot{x}_m=A_mx_m+b_mg
+$$
+с задающим воздействием $g(t)$.
+
+
+\subsection{Выполнение}
+Обозначим:
+$$
+\theta=\begin{bmatrix}
+    \theta_1\\ \theta_2\\ \theta_3
+\end{bmatrix},\ f(x)=\begin{bmatrix}
+    \cos{\left( x_1^2-x_2^5 \right)}\\
+    \sin{\left( 6x_1-7x_2 \right)}-x_2^5\\
+    \sin{\left( x_2^2 \right)}
+\end{bmatrix},\ d(x)=\cos{x_3}
+$$
+
+
+Система:
+$$
+\begin{cases}
+    \dot{x}_1=x_2,\\
+    \dot{x}_2=\theta^Tf(x)+d(x)+6u
+\end{cases}
+$$
+
+
+Рассмотрим ошибку:
+$$
+e=x_1-x=\begin{bmatrix}
+    e_1\\e_2
+\end{bmatrix}\Rightarrow \dot{e}=\dot{x}_m-\dot{x},
+$$
+$$\dot{e}=A_mx_m+b_mg-\left(\begin{bmatrix}
+    x_2\\ \theta^Tf(x)
+\end{bmatrix}+\begin{bmatrix}0\\1\end{bmatrix}d(x)+\begin{bmatrix}
+    0\\6
+\end{bmatrix}u\right)
+$$
+
+
+Обозначим:
+$$
+\begin{bmatrix}
+    0\\1
+\end{bmatrix}d(x)=B_dd(x),\ \begin{bmatrix}
+    0\\6
+\end{bmatrix}u=Bu
+$$
+
+
+Подставим $x_m=e+x$:
+$$
+\dot{e}=A_m\left( e+x \right)+b_mg-\left( \begin{bmatrix}
+    x_2\\ \theta^Tf(x)
+\end{bmatrix}+B_dd(x)+Bu \right),
+$$
+$$
+\dot{e}=A_me+b_mg+A_mx-\begin{bmatrix}
+    x_2\\ \theta^Tf(x)
+\end{bmatrix}-B_dd(x)-Bu
+$$
+\end{document}
