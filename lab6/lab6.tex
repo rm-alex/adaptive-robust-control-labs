@@ -1,0 +1,307 @@
+\documentclass[a4paper,14pt]{extarticle}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, russian]{babel}
+
+\usepackage[left=30mm, right=10mm, top=20mm, bottom=20mm]{geometry}
+
+\usepackage{tempora}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{titlesec}
+\titleformat{\section}[block]{\bfseries\centering\MakeUppercase}{\thesection.}{1em}{}
+\titleformat{\subsection}[block]{\bfseries}{\thesubsection.}{1em}{}
+\titleformat{\subsubsection}[block]{\bfseries}{\thesubsubsection.}{1em}{}
+
+\renewcommand{\contentsname}{\hfill \textbf{СОДЕРЖАНИЕ} \hfill\null}
+
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usepackage{cmap}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{LightGray}{gray}{0.7}
+
+\lstdefinestyle{code}{
+    language=Python, % change if needed
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    numberstyle=\small\color{LightGray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    rulecolor=\color{LightGray},
+    linewidth=\linewidth,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{violet},
+    escapeinside={\%*}{*)},
+    xleftmargin=10pt,
+    xrightmargin=10pt,
+    framexleftmargin=0pt,
+    framexrightmargin=0pt
+}
+\lstset{style=code}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={lab arc},
+    pdfauthor={Rumyantsev Alexey},
+    pdfsubject={control},
+    pdfkeywords={LaTeX, PDF},
+    pdfpagemode=FullScreen,
+}
+
+\graphicspath{{src/images/}}
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+        \vspace*{2.5mm}
+        Федеральное государственное автономное образовательное учреждение высшего образования
+        «НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ УНИВЕРСИТЕТ ИТМО»\\
+        \vspace*{2.5mm}
+        ФАКУЛЬТЕТ СИСТЕМ УПРАВЛЕНИЯ И РОБОТОТЕХНИКИ
+        \vfill
+
+        {\large\bfseries ОТЧЕТ ПО ЛАБОРАТОРНОЙ РАБОТЕ №6}\\
+        {\large по дисциплине}\\
+        {\large«АДАПТИВНОЕ И РОБАСТНОЕ УПРАВЛЕНИЕ»}\\
+        {\large на тему}\\
+        {\large «СИНТЕЗ АДАПТИВНОГО НАБЛЮДАТЕЛЯ СОСТОЯНИЯ ЛИНЕЙНОГО ОБЪЕКТА»}\\
+        Вариант 21
+        \vfill
+
+        \begin{flushright}
+            Выполнили: студенты\\
+            Дьячихин Д. Н., R3480\\
+            Румянцев А. А., R3441\medskip\\
+
+            Проверил: преподаватель\\
+            Парамонов А. В.
+        \end{flushright}
+        \vfill
+
+        Санкт-Петербург\\
+        2025
+    \end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+\tableofcontents
+\newpage
+
+\section{Цель работы}
+Освоение процедуры синтеза адаптивного наблюдателя линейного объекта.
+
+
+\section{Постановка задачи}
+Дан асимптотически устойчивый объект управления:
+\begin{align}
+    \begin{cases}
+        \dot{x}=Ax+Bu,\ x(0),\\
+        y=Cx,
+    \end{cases}\label{syseq:1}
+\end{align}
+где $x$ -- недоступный прямому измерению вектор состояния,
+$u,y$ -- входной и выходной сигналы объекта, доступные прямым измерениям,
+$$
+A=\begin{bmatrix}
+    -a_{n-1} &1 &\hdots &0\\
+    -a_{n-2} &0 &\hdots &0\\
+    a_{n-1} &\vdots &\ddots &1\\
+     -a_{0} &0 &\hdots &0
+\end{bmatrix},\ b=\begin{bmatrix}
+    0\\ \vdots\\0\\b_m\\\vdots\\b_0
+\end{bmatrix},\ C=\begin{bmatrix}
+    1&0&\hdots&0
+\end{bmatrix},
+$$
+$a_i,i=\overline{0,n-1},b_j,j=\overline{0,m}$ --
+неизвестные коэффициенты модели.
+
+
+Рассматриваемая задача состоит в построении оценки вектора
+состояния $\hat{x}$ такой, что:
+\begin{align}
+    \lim\limits_{t\to\infty}||x(t)-\hat{x}(t)||=0\label{eq:aim}
+\end{align}
+
+
+Синтезируемый адаптивный наблюдатель должен одновременно
+оценивать неизвестные параметры объекта управления $\theta$
+и генерировать оценку вектора состояния $\hat{x}$.
+
+
+Отметим, что в задаче класс объектов (\ref{syseq:1}) ограничен следующим
+допущением (условием согласования): для некоторого $n$-мерного
+вектора $\bar{\theta}$ матрицы $A,C,A_0$
+связаны следующим соотношением:
+$$
+A_0=A-\bar{\theta}C
+$$
+Можно показать, что для рассматриваемого класса объектов:
+$$
+\bar{\theta}=\begin{bmatrix}
+    k_{n-1}-a_{n-1}\\
+    k_{n-2}-a_{n-2}\\
+    \vdots\\
+    k_0-a_0
+\end{bmatrix}
+$$
+
+
+\section{Теоретическая часть}
+Для решения задачи используется
+параметризованное представление выходной переменной:
+\begin{align}
+    y=\theta^T\omega\label{eq:y}
+\end{align}
+и вектора состояния:
+\begin{align}
+    x=\sum\limits_{i=0}^{n-1}\theta_{i+1}\left( Is-A_0 \right)^{-1}
+    e_{n-i}[y]+\sum\limits_{j=0}^{m}\theta_{j+1+n}\left( Is-A_0 \right)^{-1}
+    e_{n-j}[u]\label{eq:x}
+\end{align}
+Заменим в (\ref{eq:y}) параметры $\theta$
+на оценки $\hat{\theta}$ и сформируем
+настраиваемую модель объекта:
+\begin{align}
+    \hat{y}=\hat{\theta}^T\omega,\label{eq:hat_y}
+\end{align}
+где $\hat{y}$ -- оценка переменной $y$.
+Введем в рассмотрение ошибку
+идентификации:
+$$
+\varepsilon=y-\hat{y}
+$$
+Учитывая (\ref{eq:y}), (\ref{eq:hat_y}), получаем:
+\begin{align}
+    \varepsilon=\tilde{\theta}^T\omega,\label{eq:vare}
+\end{align}
+где $\tilde{\theta}=\theta-\hat{\theta}$ --
+вектор параметрических ошибок. Последнее выражение
+представляет собой стандартную статическую модель ошибок,
+на основе которой при помощи функции Ляпунова $V=\tilde{\theta}^T\tilde{\theta}/2\gamma$
+и анализа ее производной строится алгоритм адаптации:
+\begin{align}
+    \dot{\hat{\theta}}=\gamma\omega\varepsilon,\label{eq:dht}
+\end{align}
+где $\gamma>0$ -- коэффициент адаптации.
+
+
+Действительно, расчет производной $\dot{V}$ дает:
+$$
+\dot{V}=\frac{1}{\gamma}\tilde{\theta}^T\dot{\tilde{\theta}}=-\frac{1}{\gamma}\tilde{\theta}^T\dot{\hat{\theta}}
+$$
+При выборе структуры алгоритма адаптации (\ref{eq:dht}) имеем:
+$$
+\dot{V}=-\frac{1}{\gamma}\tilde{\theta}^T\gamma\omega\varepsilon=-\varepsilon^2<0
+$$
+Из последнего неравенства при условии ограниченности функции $\omega$ и ее
+первой производной $\dot{\omega}$ (условие накладывается на входной сигнал $u$)
+следуют свойства системы, состоящей (\ref{eq:vare}), (\ref{eq:dht}):
+\begin{itemize}
+    \item все сигналы в системе ограничены;
+    \item ошибка $\varepsilon$ стремится к нулю асимптотически;
+    \item параметрические ошибки $\tilde{\theta}$
+    стремятся к нулю экспоненциально,
+    если вектор $\omega$ удовлетворяет условию неисчезающего возбуждения:
+    \begin{align}
+        \int\limits_{t}^{t+T}x(\tau)x^T\,d\tau>\alpha I,\ \alpha>0,T>0\label{eq:unv}
+    \end{align}
+    Условие (\ref{eq:unv}) в конечном итоге зависит от
+    частотной насыщенности сигнала $u$, который должен содержать
+    <<достаточное>> количество гармоник;
+    \item если ошибки $\tilde{\theta}$ стремятся к нулю,
+    то оценка вектора состояния $\hat{x}$ также стремится к $x$.
+\end{itemize}
+
+
+После замены в (\ref{eq:x}) параметров $\theta$ на оценки $\hat{\theta}$ получаем оценку
+вектора состояния:
+\begin{align}
+    \hat{x}=\sum\limits_{i=0}^{n-1}\hat{\theta}_{i+1}\left( Is-A_0 \right)^{-1}
+    e_{n-i}[y]+\sum\limits_{j=0}^{m}\hat{\theta}_{j+1+n}\left( Is-A_0 \right)^{-1}
+    e_{n-j}[u]\label{eq:hat_x}
+\end{align}
+
+
+Таким образом, адаптивный наблюдатель, обеспечивающий
+выполнение условия (\ref{eq:aim}) (при выполнении условия неисчезающего
+возбуждения (\ref{eq:unv})), состоит из настраиваемой модели (\ref{eq:hat_y}), алгоритма
+адаптации (\ref{eq:dht}) и алгоритма оценивания вектора состояния (\ref{eq:hat_x}).
+
+
+\section{Экспериментальная часть}
+\subsection{Определение параметров системы}
+Согласно варианту 21, в данной работе система (\ref{syseq:1})
+имеет вид:
+$$
+A=\begin{bmatrix}
+    -a_1&1\\-a_0&0
+\end{bmatrix}=\begin{bmatrix}
+    -1&1\\-5&0
+\end{bmatrix},\ b=\begin{bmatrix}
+    b_1\\b_0
+\end{bmatrix}=\begin{bmatrix}
+    3\\9
+\end{bmatrix},\ C=\begin{bmatrix}
+    1&0
+\end{bmatrix}
+$$
+
+
+Также даны коэффициенты фильтра:
+$$
+k_1=8,\ k_0=16
+$$
+
+
+\subsection{Моделирование адаптивного наблюдателя при синусоидальном входном сигнале}
+Промоделируем адаптивный наблюдатель вектора состояния объекта (\ref{eq:hat_y}),
+(\ref{eq:dht}), (\ref{eq:hat_x}) при входном сигнале:
+$$
+u(t)=10\sin{t}
+$$
+
+
+\subsection{Моделирование адаптивного наблюдателя при входном сигнале, состоящем из суммы гармоник}
+Повторим эксперимент при:
+$$
+u(t)=10\sin{t}+5\cos{2t}+4\cos{4t}+3\cos{8t}
+$$
+
+
+\subsection{Выводы}
+...
+
+
+\section{Вывод}
+...
+\end{document}
