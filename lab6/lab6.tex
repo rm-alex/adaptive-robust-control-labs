@@ -35,7 +35,7 @@
 \definecolor{LightGray}{gray}{0.7}
 
 \lstdefinestyle{code}{
-    language=Python, % change if needed
+    language=matlab, % change if needed
     basicstyle=\small\ttfamily,
     numbers=left,
     numberstyle=\small\color{LightGray},
@@ -273,13 +273,27 @@ A=\begin{bmatrix}
     3\\9
 \end{bmatrix},\ C=\begin{bmatrix}
     1&0
+\end{bmatrix},
+$$
+
+
+Гурвицева матрица с коэффициентами фильтра:
+$$
+A_0=\begin{bmatrix}
+    -k_1&1\\-k_0&0
+\end{bmatrix}=\begin{bmatrix}
+    -8&1\\-16&0
 \end{bmatrix}
 $$
 
 
-Также даны коэффициенты фильтра:
+Вектор параметров:
 $$
-k_1=8,\ k_0=16
+\theta=\begin{bmatrix}
+    k_0-a_0\\k_1-a_1\\b_0\\b_1
+\end{bmatrix}=\begin{bmatrix}
+    11\\7\\9\\3
+\end{bmatrix}
 $$
 
 
@@ -287,21 +301,120 @@ $$
 Промоделируем адаптивный наблюдатель вектора состояния объекта (\ref{eq:hat_y}),
 (\ref{eq:dht}), (\ref{eq:hat_x}) при входном сигнале:
 $$
-u(t)=10\sin{t}
+u(t)=10\sin{t}:=u_1
 $$
+и коэффициенте адаптации $\gamma=1$.
+
+
+Схема моделирования:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.43]{scheme.png}
+    \caption{Схема моделирования}
+    \label{fig:sch}
+\end{figure}
+
+
+Код блока матлаб-функции сигнала $u_1$:
+\begin{lstlisting}[label=c1, caption={Реализация матлаб-функции $u_1$}]
+function u = fcn(t)
+u = 10*sin(t);
+\end{lstlisting}
+
+
+Код блока матлаб-функции, расcчитывающий $\hat{y},\varepsilon,\tilde{\theta}$ и $\dot{\hat{\theta}}$:
+\begin{lstlisting}[label=cc1, caption={Реализация матлаб-функции расчета $\hat{y},\varepsilon,\tilde{\theta}$ и $\dot{\hat{\theta}}$}]
+function [y_hat, eps, theta_tilde, theta_hat_dot] = fcn(y, omega, theta_hat, theta)
+gamma=1;
+y_hat = theta_hat'*omega;
+eps = y-y_hat;
+theta_tilde = theta-theta_hat;
+theta_hat_dot = gamma*omega*eps;
+\end{lstlisting}
+
+
+Исходные данные схемы:
+\begin{lstlisting}[label=ccc1, caption={Исходные данные схемы симулинк: $a_i,b_i,k_i,\theta,A_0,A,b,C,D$}]
+k0=16;
+k1=8;
+a0=5;
+a1=1;
+b0=9;
+b1=3;
+theta=[k0-a0;k1-a1;b0;b1];
+A0=[-k1 1; -k0 0];
+A=[-a1 1; -a0 0];
+b=[b1;b0];
+C=[1 0];
+D=[0;0];
+\end{lstlisting}
+
+
+Выполним моделирование:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{e1.png}
+    \caption{График нормы ошибки $||x(t)-\hat{x}(t)||$ при $u_1$}
+    \label{fig:e1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{tt1.png}
+    \caption{График параметрической ошибки $\tilde{\theta}$ при $u_1$}
+    \label{fig:tt1}
+\end{figure}
 
 
 \subsection{Моделирование адаптивного наблюдателя при входном сигнале, состоящем из суммы гармоник}
 Повторим эксперимент при:
 $$
-u(t)=10\sin{t}+5\cos{2t}+4\cos{4t}+3\cos{8t}
+u(t)=10\sin{t}+5\cos{2t}+4\cos{4t}+3\cos{8t}:=u_2
 $$
 
 
+Код блока матлаб-функции сигнала $u_2$:
+\begin{lstlisting}[label=c2, caption={Реализация матлаб-функции $u_2$}]
+function u = fcn(t)
+u = 10*sin(t)+5*cos(2*t)+4*cos(4*t)+3*cos(8*t);
+\end{lstlisting}
+
+
+Выполним моделирование:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{e2.png}
+    \caption{График нормы ошибки $||x(t)-\hat{x}(t)||$ при $u_2$}
+    \label{fig:e2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{tt2.png}
+    \caption{График параметрической ошибки $\tilde{\theta}$ при $u_2$}
+    \label{fig:tt2}
+\end{figure}
+
+
 \subsection{Выводы}
-...
+При возбуждающем воздействии в виде одной гармоники $u_1$
+оценки состояния и параметров не сходятся с нулевой ошибкой к
+истинным значениям. Вместо этого получается устоявшаяся ошибка.
+Это можно объяснить тем, что условие неисчезающего возбуждения
+при таком входе не выполняется -- возбуждающее воздействие
+недостаточно разнообразно.
+
+
+При возбуждающем воздействии из нескольких гармоник $u_2$
+условие неисчезающего возбуждения выполняется, ошибки
+оценок стремятся к нулю асимптотически. Это подтверждает
+корректность синтеза адаптивного наблюдателя.
 
 
 \section{Вывод}
-...
+В ходе выполнения лабораторной работы
+был смоделирован адаптивный наблюдатель
+при различных входных воздействиях.
+Результаты показали, что при невыполнении
+условия неисчезающего возбуждения ошибки
+оценивания не стремятся асимптотически к нулю,
+а сходятся с устоявшейся ошибкой.
 \end{document}
