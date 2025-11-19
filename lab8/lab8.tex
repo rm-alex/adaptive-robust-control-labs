@@ -124,30 +124,6 @@
 
 
 \section{Постановка задачи}
-Рассмотрим задачу
-слежения выходной переменной $y$ за эталонным сигналом $y_M$,
-формируемым эталонной моделью вида:
-\begin{align}
-    y_M(t)=\frac{k_0}{K_M(s)}\left[ g(t) \right],\label{eq:ym}
-\end{align}
-где $g$ -- сигнал задания, $K_M(s)$ --
-гурвицевый полином, определяющий
-желаемую динамику замкнутой системы.
-Полином $K_M(s)$ строится на
-основе метода стандартных полиномов,
-исходя из заданных динамических
-характеристик.
-
-
-Цель управления заключается в синтезе управления $u$,
-компенсирующего неопределенности объекта и обеспечивающего при
-условии ограниченности всех сигналов выполнение целевого равенства:
-\begin{align}
-    \lim\limits_{t\to\infty}(y_M(t)-y(t))=0\label{eq:aim}
-\end{align}
-
-
-\section{Теоретическая часть}
 Рассмотрим минимально-фазовую
 линейную модель объекта,
 представленную в форме <<вход-выход>>:
@@ -198,96 +174,168 @@ $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
 в векторе $\Psi$.
 
 
-Сформируем ошибку управления по выходу $\varepsilon=y_M-y$
-и с учетом (\ref{eq:yt}), (\ref{eq:ym}), проведем простейшие преобразования:
-\begin{align*}
-    \varepsilon=&\frac{k_0}{K_M(s)}[g]-\frac{1}{K_M(s)}\left[ \Psi^T\omega+b_m u \right]=\\
-    &=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]
-\end{align*}
-
-
-Окончательно имеем:
+Рассмотрим задачу
+слежения выходной переменной $y$ за эталонным сигналом $y_M$,
+формируемым эталонной моделью вида:
 \begin{align}
-    \varepsilon=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]\label{eq:eps}
+    y_M(t)=\frac{k_0}{K_M(s)}\left[ g(t) \right],\label{eq:ym}
+\end{align}
+где $g$ -- сигнал задания, $K_M(s)$ --
+гурвицевый полином, определяющий
+желаемую динамику замкнутой системы.
+Полином $K_M(s)$ строится на
+основе метода стандартных полиномов,
+исходя из заданных динамических
+характеристик.
+
+
+Цель управления заключается в синтезе управления $u$,
+компенсирующего неопределенности объекта и обеспечивающего при
+условии ограниченности всех сигналов выполнение целевого равенства:
+\begin{align}
+    \lim\limits_{t\to\infty}(y_M(t)-y(t))=0\label{eq:aim}
 \end{align}
 
 
-Выражение (\ref{eq:eps}) позволяет сформировать компенсирующий закон
-управления вида:
+\section{Теоретическая часть}
+% Для решения задачи сформируем ошибку управления по выходу $\varepsilon=y_M-y$
+% и с учетом (\ref{eq:yt}), (\ref{eq:ym}), проведем простейшие преобразования:
+% \begin{align*}
+%     \varepsilon=&\frac{k_0}{K_M(s)}[g]-\frac{1}{K_M(s)}\left[ \Psi^T\omega+b_m u \right]=\\
+%     &=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]
+% \end{align*}
+
+
+% Окончательно имеем:
+% \begin{align}
+%     \varepsilon=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]\label{eq:eps}
+% \end{align}
+
+
+% Выражение (\ref{eq:eps}) позволяет сформировать компенсирующий закон
+% управления вида:
+\subsection{Способ №1 ($\boldsymbol{b_m}$ известно)}
+Закон управления формируется в виде
 \begin{align}
-    u=\frac{1}{\hat{b}_m}\left( -\hat{\Psi}^T\omega+k_0g \right),\label{eq:u}
+    u=\frac{1}{b_m}\left( \hat{\Psi}^T\omega_p+k_0g \right)\label{eq:u}
 \end{align}
-где $\hat{\Psi}$ -- вектор оценок $\Psi$, $\hat{b}_m$ -- оценка $b_m$.
-
-
-С целью предотвращения деления на ноль в законе
-управления (\ref{eq:u}) необходимо использовать алгоритм адаптации с
-добавлением оператора проекции.
-
-
-Для формирования алгоритма адаптации, генерирующего оценки $\hat{\Psi}$
-и $\hat{b}_m$, подставим (\ref{eq:u}) в (\ref{eq:eps})
-и получим динамическую модель ошибок с
-измеряемым выходом:
+% \begin{align}
+%     u=\frac{1}{\hat{b}_m}\left( -\hat{\Psi}^T\omega_p+k_0g \right),\label{eq:u2}
+% \end{align}
+% где $\hat{\Psi}$ -- вектор оценок $\Psi$, $\hat{b}_m$ -- оценка $b_m$.
+Введем в рассмотрение сигнал расширенной ошибки:
 \begin{align}
-    \varepsilon=\frac{1}{K_M(s)}\left[ \tilde{\Psi}^T\omega-\tilde{b}_mu \right]=\frac{1}{K_M(s)}\left[ \tilde{\Psi}_p^T\omega_p \right],\label{eq:eps2}
+    \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\overline{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
 \end{align}
-где $\tilde{\Psi}=\Psi-\hat{\Psi},\tilde{b}_m=b_m-\hat{b}_m$ --
-параметрические ошибки, $\tilde{\Psi}_p^T=\left[ \tilde{\Psi}^T,\tilde{b}_m \right],
-\omega_p^T=\left[ -\omega^T,-u \right]$.
+где:
+$$\omega_p=-\omega,\ \overline{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
+Тогда, с учетом:
+\begin{align}
+    \varepsilon=\tilde{\Psi}_p^T\overline{\omega}_p+\hat{\Psi}_p^T\overline{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
+\end{align}
+(\ref{eq:heps}) примет вид:
+\begin{align}
+    \hat{\varepsilon}=\tilde{\Psi}^T\overline{\omega}_p\label{eq:heps2}
+\end{align}
+Выражение (\ref{eq:heps2}) представляет собой статическую модель ошибки, на
+базе которой строится алгоритм адаптации:
+\begin{align}
+    \dot{\hat{\Psi}}=\gamma\frac{\overline{\omega}_p}{1+\overline{\omega}_p^T\overline{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
+\end{align}
 
 
-В случае, если передаточная функция:
+% С целью предотвращения деления на ноль в законе
+% управления (\ref{eq:u}) необходимо использовать алгоритм адаптации с
+% добавлением оператора проекции.
+
+
+% Для формирования алгоритма адаптации, генерирующего оценки $\hat{\Psi}$
+% и $\hat{b}_m$, подставим (\ref{eq:u}) в (\ref{eq:eps})
+% и получим динамическую модель ошибок с
+% измеряемым выходом:
+% \begin{align}
+%     \varepsilon=\frac{1}{K_M(s)}\left[ \tilde{\Psi}^T\omega-\tilde{b}_mu \right]=\frac{1}{K_M(s)}\left[ \tilde{\Psi}_p^T\omega_p \right],\label{eq:eps2}
+% \end{align}
+% где $\tilde{\Psi}=\Psi-\hat{\Psi},\tilde{b}_m=b_m-\hat{b}_m$ --
+% параметрические ошибки, $\tilde{\Psi}_p^T=\left[ \tilde{\Psi}^T,\tilde{b}_m \right],
+% \omega_p^T=\left[ -\omega^T,-u \right]$.
+
+
+% В случае, если передаточная функция:
+% $$
+% H(s)=\frac{1}{K_M(s)}
+% $$
+% является строго положительно вещественной (СПВ), алгоритм адаптации
+% для настройки регулятора (\ref{eq:u}) может быть представлен в следующей
+% форме:
+% \begin{align}
+%     \dot{\hat{\Psi}}_p=\gamma\Gamma\omega_p\varepsilon,\label{eq:dhp}
+% \end{align}
+% где $\gamma>0$ -- коэффициент адаптации, $\hat{\Psi}_p^T=\left[ \hat{\Psi}^T,\hat{b}_m \right]$,
+% \begin{align}
+%     \Gamma=\begin{cases}
+%         I_{2n}, &\hat{b}_m(t)\geq b_{\min},\\
+%         I_{2n}-\zeta_{2n}\zeta_{2n}^T, &\hat{b}_m(t)<b_{\min},
+%     \end{cases}\label{eq:Gamma}
+% \end{align}
+% где $\zeta_{2n}=\left[ 0,0,...,0,1 \right]$ --
+% координатный вектор размерности $2n$.
+% Вторая строка в последнем выражении позволяет
+% <<остановить>> функцию $\hat{b}_m(t)$
+% в момент пересечения границы $b_{\min}$
+% в целях избежать деление на ноль в (\ref{eq:u}).
+
+
+% С помощью выражений (\ref{eq:dhp}), (\ref{eq:Gamma}) можно показать, что оценки $\hat{\Psi}$
+% и $\hat{b}_m$, необходимые для закона управления (\ref{eq:u}), генерируются согласно
+% следующим правилам:
+% \begin{align}
+%     &\dot{\hat{\Psi}}=-\gamma\omega\varepsilon,\label{eq:dhp2}\\
+%     &\dot{\hat{b}}_m=\begin{cases}
+%         -\gamma u\varepsilon, &\hat{b}_m(t)\geq b_{\min},\\
+%         0, &\hat{b}_m(t)<b_{\min}
+%     \end{cases}\label{eq:dhb}
+% \end{align}
+
+
+% Таким образом, закон адаптивного управления, построенный на
+% основе параметризованного представления (\ref{eq:yt}), состоит из эталонной
+% модели (\ref{eq:ym}), настраиваемого регулятора (\ref{eq:u}) и алгоритмов адаптации
+% (\ref{eq:dhp2}), (\ref{eq:dhb}). Закон управления формируется на основе измерения
+% выходной переменной и не использует информацию о состоянии объекта,
+% что является его отличительной особенностью.
+
+
+% Важно отметить, что начальное условие $\hat{b}_m(0)$ в алгоритме (\ref{eq:dhb})
+% выбирается из условия $\hat{b}_m(0)\geq b_{\min}$.
+
+
+\subsection{Способ №2 ($\boldsymbol{b_m}$ неизвестно)}
+Закон управления формируется в виде:
+\begin{align}
+    u=\hat{\Psi}^T\omega\label{eq:u3}
+\end{align}
+Введем в рассмотрение сигнал расширенной ошибки:
+\begin{align}
+    \hat{\varepsilon}=\varepsilon+\hat{k}\xi,\label{eq:heps3}
+\end{align}
+где:
 $$
-H(s)=\frac{1}{K_M(s)}
+\xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\overline{\omega},\ \omega=\left[ \nu_1,\nu_2,y,g \right],\ \overline{\omega}\frac{1}{K_M(s)}\left[ \omega \right]
 $$
-является строго положительно вещественной (СПВ), алгоритм адаптации
-для настройки регулятора (\ref{eq:u}) может быть представлен в следующей
-форме:
+Алгоритм адаптации примет следующий вид:
 \begin{align}
-    \dot{\hat{\Psi}}_p=\gamma\Gamma\omega_p\varepsilon,\label{eq:dhp}
+    \dot{\hat{\Psi}}=\gamma_1\frac{\overline{\omega}}{1+\overline{\omega}^T\overline{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
+    \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\overline{\omega}^T\overline{\omega}}\hat{\varepsilon}\label{eq:dhk}
 \end{align}
-где $\gamma>0$ -- коэффициент адаптации, $\hat{\Psi}_p^T=\left[ \hat{\Psi}^T,\hat{b}_m \right]$,
-\begin{align}
-    \Gamma=\begin{cases}
-        I_{2n}, &\hat{b}_m(t)\geq b_{\min},\\
-        I_{2n}-\zeta_{2n}\zeta_{2n}^T, &\hat{b}_m(t)<b_{\min},
-    \end{cases}\label{eq:Gamma}
-\end{align}
-где $\zeta_{2n}=\left[ 0,0,...,0,1 \right]$ --
-координатный вектор размерности $2n$.
-Вторая строка в последнем выражении позволяет
-<<остановить>> функцию $\hat{b}_m(t)$
-в момент пересечения границы $b_{\min}$
-в целях избежать деление на ноль в (\ref{eq:u}).
-
-
-С помощью выражений (\ref{eq:dhp}), (\ref{eq:Gamma}) можно показать, что оценки $\hat{\Psi}$
-и $\hat{b}_m$, необходимые для закона управления (\ref{eq:u}), генерируются согласно
-следующим правилам:
-\begin{align}
-    &\dot{\hat{\Psi}}=-\gamma\omega\varepsilon,\label{eq:dhp2}\\
-    &\dot{\hat{b}}_m=\begin{cases}
-        -\gamma u\varepsilon, &\hat{b}_m(t)\geq b_{\min},\\
-        0, &\hat{b}_m(t)<b_{\min}
-    \end{cases}\label{eq:dhb}
-\end{align}
-
-
-Таким образом, закон адаптивного управления, построенный на
-основе параметризованного представления (\ref{eq:yt}), состоит из эталонной
-модели (\ref{eq:ym}), настраиваемого регулятора (\ref{eq:u}) и алгоритмов адаптации
-(\ref{eq:dhp2}), (\ref{eq:dhb}). Закон управления формируется на основе измерения
-выходной переменной и не использует информацию о состоянии объекта,
-что является его отличительной особенностью.
-
-
-Важно отметить, что начальное условие $\hat{b}_m(0)$ в алгоритме (\ref{eq:dhb})
-выбирается из условия $\hat{b}_m(0)\geq b_{\min}$.
 
 
 \section{Экспериментальная часть}
-...
+\subsection{Параметры системы}
+Согласно варианту 21, исходные данные:
+$$
+a_0=9,\ a_1=6,\ b_0=9,\ k_{M,1}=6,\ k_{M,0}=9,\ k_0=1,\ g(t)=0.4\sin{3t}+\cos{0.1t}
+$$
 
 
 \section{Вывод}
