@@ -131,40 +131,6 @@
     y^{(n)}+a_{n-1}y^{(n-1)}+...+a_0y=b_mu^{(m)}+b_{m-1}u^{(m-1)}+...+b_0u,\label{eq:mpomio}
 \end{align}
 где $a_i,i=\overline{0,n-1},b_j=\overline{0,m}$ -- неизвестные параметры объекта.
-% Предполагается, что знак величины $b_m$ известен. Пусть в решаемой задаче
-% $b_m\geq b_{\min}>0,b_{\min}$ -- известная величина.
-
-
-% Вместе с моделью рассмотрим динамические фильтры:
-% \begin{align}
-%     \dot{\nu}_1=\Lambda \nu_1+e_{n-1}u,\label{eq:dv1}\\
-%     \dot{\nu}_2=\Lambda \nu_2+e_{n-1}y,\label{eq:dv2}
-% \end{align}
-% где $\nu_1,\nu_2\in\mathbb{R}^{n-1}$ -- векторы состояния фильтров,
-% $e_{n-1}=\operatorname{col}(0,...,0,1),e_{n-1}\in\mathbb{R}^{n-1}$,
-% $$
-% \Lambda=\begin{bmatrix}
-%     0&1&0&...&0\\
-%     0&0&1&...&0\\
-%     \vdots&\vdots&\vdots&\ddots&\vdots\\
-%     0&0&0&...&1\\
-%     -k_0&-k_1&-k_2&...&-k_{n-2}
-% \end{bmatrix}
-% $$
-% Матрица $\Lambda$ имеет сопровождающий полином:
-% $$
-% K(s)=s^{n-1}+k_{n-2}s^{n-2}+k_{n-3}s^{n-3}+...+k_0
-% $$
-% Для любых нормированных устойчивых полиномов
-% $K(s),K_M(s)$ степени $n-1,n-m$ соответственно
-% существует единственный постоянный вектор
-% $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
-% параметров объекта, такой, что объект (\ref{eq:mpomio})
-% может быть представлен в виде:
-
-% Параметризованное представление (\ref{eq:yt}) позволяет синтезировать
-% управление, компенсирующее неопределенности модели, сосредоточенные
-% в векторе $\Psi$.
 
 
 Задача --
@@ -196,140 +162,143 @@
 \begin{align}
     y(t)=\frac{1}{K_M(s)}\left[ \Psi^T\omega(t)+b_mu(t) \right]+\delta(t),\label{eq:yt}
 \end{align}
-где $\omega^T=\left[ \nu_1^T,\nu_2^T,y \right],\delta(t)$ --
+где регрессор $\omega^T=\left[ \nu_1^T,\nu_2^T,y \right],\delta(t)$ --
 экспоненциально затухающая функция,
-определяемая ненулевыми начальными условиями.
-
-% Для решения задачи сформируем ошибку управления по выходу $\varepsilon=y_M-y$
-% и с учетом (\ref{eq:yt}), (\ref{eq:ym}), проведем простейшие преобразования:
-% \begin{align*}
-%     \varepsilon=&\frac{k_0}{K_M(s)}[g]-\frac{1}{K_M(s)}\left[ \Psi^T\omega+b_m u \right]=\\
-%     &=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]
-% \end{align*}
+определяемая ненулевыми начальными условиями, $K_M(s)$
+-- нормированный устойчивый полином степени $n-m$.
 
 
-% Окончательно имеем:
-% \begin{align}
-%     \varepsilon=\frac{1}{K_M(s)}\left[ k_0g-\Psi^T\omega-b_mu \right]\label{eq:eps}
-% \end{align}
+Вместе с моделью рассмотрим динамические фильтры:
+\begin{align}
+    \dot{\nu}_1=\Lambda \nu_1+e_{n-1}u,\label{eq:dv1}\\
+    \dot{\nu}_2=\Lambda \nu_2+e_{n-1}y,\label{eq:dv2}
+\end{align}
+где $\nu_1,\nu_2\in\mathbb{R}^{n-1}$ -- векторы состояния фильтров,
+$e_{n-1}=\operatorname{col}(0,...,0,1),e_{n-1}\in\mathbb{R}^{n-1}$,
+$$
+\Lambda=\begin{bmatrix}
+    0&1&0&...&0\\
+    0&0&1&...&0\\
+    \vdots&\vdots&\vdots&\ddots&\vdots\\
+    0&0&0&...&1\\
+    -k_0&-k_1&-k_2&...&-k_{n-2}
+\end{bmatrix}
+$$
+Матрица $\Lambda$ имеет сопровождающий полином:
+$$
+K(s)=s^{n-1}+k_{n-2}s^{n-2}+k_{n-3}s^{n-3}+...+k_0
+$$
 
 
-% Выражение (\ref{eq:eps}) позволяет сформировать компенсирующий закон
-% управления вида:
-% \subsection{Способ №1 ($\boldsymbol{b_m}$ известно)}
-% Закон управления формируется в виде
-% \begin{align}
-%     u=\frac{1}{b_m}\left( \hat{\Psi}^T\omega_p+k_0g \right)\label{eq:u}
-% \end{align}
-% \begin{align}
-%     u=\frac{1}{\hat{b}_m}\left( -\hat{\Psi}^T\omega_p+k_0g \right),\label{eq:u2}
-% \end{align}
-% где $\hat{\Psi}$ -- вектор оценок $\Psi$, $\hat{b}_m$ -- оценка $b_m$.
-% Введем в рассмотрение сигнал расширенной ошибки:
-% \begin{align}
-%     \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\bar{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
-% \end{align}
-% где:
-% $$\omega_p=-\omega,\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
-% Тогда, с учетом:
-% \begin{align}
-%     \varepsilon=\tilde{\Psi}_p^T\bar{\omega}_p+\hat{\Psi}_p^T\bar{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
-% \end{align}
-% (\ref{eq:heps}) примет вид:
-% \begin{align}
-%     \hat{\varepsilon}=\tilde{\Psi}^T\bar{\omega}_p\label{eq:heps2}
-% \end{align}
-% Выражение (\ref{eq:heps2}) представляет собой статическую модель ошибки, на
-% базе которой строится алгоритм адаптации:
-% \begin{align}
-%     \dot{\hat{\Psi}}=\gamma\frac{\bar{\omega}_p}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
-% \end{align}
+Решение задачи адаптивного управления
+по выходу предполагает ограниченный класс
+объектов вида (\ref{eq:mpomio}). Класс ограничивается строго положительно вещественными (СПВ) передаточными
+функциями. Так, например, передаточная функция
+$$
+H(s)=\frac{1}{K_M(s)}
+$$
+модели ошибки
+\begin{align}
+    \varepsilon=y_M-y=\frac{1}{K_M(s)}\left[ \tilde{\Psi}_p^T\omega_p \right],\ \tilde{\Psi}_p^T=\left[ \tilde{\Psi}^T,\tilde{b}_m \right],\ \omega_p^T=\left[ -\omega^T,-u \right]\label{eq:eps7}
+\end{align}
+с $\tilde{\Psi}=\Psi-\hat{\Psi},\tilde{b}_m=b_m-\hat{b}_m$
+при порядке полинома $K_M(s)$ больше единицы не является СПВ, а значит,
+алгоритм адаптации
+\begin{align}
+    \dot{\hat{\Psi}}_p=\gamma\Gamma\omega_p\varepsilon,\ \gamma>0,\ \hat{\Psi}_p^T=\left[ \hat{\Psi}^T,\hat{b}_m \right],\ \Gamma=\begin{cases}
+        I_{2n}, &\hat{b}_m(t)\geq b_{\min},\\
+        I_{2n}-\zeta_{2n}\zeta_{2n}^T, &\hat{b}_m(t)<b_{\min}
+    \end{cases}\label{eq:dhp}
+\end{align}
+с $\zeta_{2n}=\left[ 0,0,...,0,1 \right]$
+не применим.
 
 
-% С целью предотвращения деления на ноль в законе
-% управления (\ref{eq:u}) необходимо использовать алгоритм адаптации с
-% добавлением оператора проекции.
+Для решения этой проблемы
+преобразуем динамическую модель
+ошибки (\ref{eq:eps7}) к виду:
+\begin{align}
+    \varepsilon=\tilde{\Psi}_p^T\bar{\omega}_p+\hat{\Psi}_p^T\bar{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right],\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]\label{eq:eps8}
+\end{align}
+Введем в рассмотрение сигнал расширенной ошибки:
+\begin{align}
+    \hat{\varepsilon}=\varepsilon-\hat{\Psi}_p^T\bar{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:heps}
+\end{align}
+С учетом (\ref{eq:eps8}) равенство (\ref{eq:heps}) примет вид:
+\begin{align}
+    \hat{\varepsilon}=\tilde{\Psi}_p^T\bar{\omega}_p\label{eq:heps2}
+\end{align}
+Выражение (\ref{eq:heps2})
+представляет собой статическую модель ошибки, на
+базе которой строится алгоритм адаптации:
+\begin{align}
+    \dot{\hat{\Psi}}_p=\gamma\Gamma\frac{\bar{\omega}_p}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat{\varepsilon},\label{eq:dhpp}
+\end{align}
+где $\Gamma$ определена в выражении (\ref{eq:dhp}).
 
 
-% Для формирования алгоритма адаптации, генерирующего оценки $\hat{\Psi}$
-% и $\hat{b}_m$, подставим (\ref{eq:u}) в (\ref{eq:eps})
-% и получим динамическую модель ошибок с
-% измеряемым выходом:
-% \begin{align}
-%     \varepsilon=\frac{1}{K_M(s)}\left[ \tilde{\Psi}^T\omega-\tilde{b}_mu \right]=\frac{1}{K_M(s)}\left[ \tilde{\Psi}_p^T\omega_p \right],\label{eq:eps2}
-% \end{align}
-% где $\tilde{\Psi}=\Psi-\hat{\Psi},\tilde{b}_m=b_m-\hat{b}_m$ --
-% параметрические ошибки, $\tilde{\Psi}_p^T=\left[ \tilde{\Psi}^T,\tilde{b}_m \right],
-% \omega_p^T=\left[ -\omega^T,-u \right]$.
+Алгоритм (\ref{eq:dhpp}) с учетом (\ref{eq:dhp}) можно представить в виде:
+\begin{align}
+    &\dot{\hat{\Psi}}=-\gamma_1\frac{\bar{\omega}}{1+\bar{\omega}^T\bar{\omega}}\hat\varepsilon,\label{eq:dhp2}\\
+    &\dot{\hat{b}}_m=\begin{cases}
+        -\gamma_2\frac{\bar{u}}{1+\bar{\omega}^T\bar{\omega}}\hat\varepsilon, & \hat{b}_m(t)\geq b_{\min},\\
+        0, &\hat{b}_m(t)<b_{\min},
+    \end{cases}\label{eq:dhbm}\\
+    &u=\frac{1}{\hat{b}_m}\left( -\hat{\Psi}^T\omega+k_0g \right),\label{eq:u}
+\end{align}
+где
+$$
+\bar{\omega}=\frac{1}{K_M(s)}\left[ \omega \right],\ \bar{u}=\frac{1}{K_M(s)}\left[ u \right],\ \gamma_{1,2}>0
+$$
 
 
-% В случае, если передаточная функция:
-% $$
-% H(s)=\frac{1}{K_M(s)}
-% $$
-% является строго положительно вещественной (СПВ), алгоритм адаптации
-% для настройки регулятора (\ref{eq:u}) может быть представлен в следующей
-% форме:
-% \begin{align}
-%     \dot{\hat{\Psi}}_p=\gamma\Gamma\omega_p\varepsilon,\label{eq:dhp}
-% \end{align}
-% где $\gamma>0$ -- коэффициент адаптации, $\hat{\Psi}_p^T=\left[ \hat{\Psi}^T,\hat{b}_m \right]$,
-% \begin{align}
-%     \Gamma=\begin{cases}
-%         I_{2n}, &\hat{b}_m(t)\geq b_{\min},\\
-%         I_{2n}-\zeta_{2n}\zeta_{2n}^T, &\hat{b}_m(t)<b_{\min},
-%     \end{cases}\label{eq:Gamma}
-% \end{align}
-% где $\zeta_{2n}=\left[ 0,0,...,0,1 \right]$ --
-% координатный вектор размерности $2n$.
-% Вторая строка в последнем выражении позволяет
-% <<остановить>> функцию $\hat{b}_m(t)$
-% в момент пересечения границы $b_{\min}$
-% в целях избежать деление на ноль в (\ref{eq:u}).
+Таким образом, закон адаптивного управления состоит из
+настраиваемого регулятора (\ref{eq:u}), расширенной ошибки (\ref{eq:heps}) и алгоритма
+адаптации (\ref{eq:dhpp}). Алгоритм адаптации генерирует настраиваемые
+параметры регулятора, содержащиеся в векторе $\hat{\Psi}_p^T$.
 
 
-% С помощью выражений (\ref{eq:dhp}), (\ref{eq:Gamma}) можно показать, что оценки $\hat{\Psi}$
-% и $\hat{b}_m$, необходимые для закона управления (\ref{eq:u}), генерируются согласно
-% следующим правилам:
-% \begin{align}
-%     &\dot{\hat{\Psi}}=-\gamma\omega\varepsilon,\label{eq:dhp2}\\
-%     &\dot{\hat{b}}_m=\begin{cases}
-%         -\gamma u\varepsilon, &\hat{b}_m(t)\geq b_{\min},\\
-%         0, &\hat{b}_m(t)<b_{\min}
-%     \end{cases}\label{eq:dhb}
-% \end{align}
+Зададим функцию
+Ляпунова $V=\tilde{\Psi}_p^T\tilde{\Psi}_p/(2\gamma)$
+для анализа устойчивости.
+Ее производная:
+$$
+\dot{V}=\frac{1}{\gamma}\tilde{\Psi}_p^T\dot{\tilde{\Psi}}_p=-\frac{1}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat\varepsilon^2<0
+$$
+Следовательно, сигналы $\hat\varepsilon,\dot{\hat{\Psi}}_p$ стремятся к нулю
+асимптотически. Далее, применяя к (\ref{eq:heps})
+Лемму о перестановке, получаем:
+\begin{align}
+    \hat\varepsilon=\varepsilon-H_{KC}(s)\left[ H_{KB}(s)\left[ \omega_p^T \right]\dot{\hat{\Psi}}_p \right]\label{eq:heps3}
+\end{align}
+В последнем выражении $H_{KC}(s)=C_K\left( Is-A_K \right)^{-1}$,
+$H_{KB}(s)=\left( Is-A_K \right)^{-1}b_K$ --
+передаточные матрицы, получаемые на основе модификации
+передаточной функции:
+$$
+\frac{1}{K_M(s)}=C_K\left( Is-A_K \right)^{-1}b_K,
+$$
+которая рассчитывается на основе тройки матриц
+$\left( A_K,b_K,C_K \right)$ --
+минимальной реализации передаточной функции $1/K_M(s)$.
 
 
-% Таким образом, закон адаптивного управления, построенный на
-% основе параметризованного представления (\ref{eq:yt}), состоит из эталонной
-% модели (\ref{eq:ym}), настраиваемого регулятора (\ref{eq:u}) и алгоритмов адаптации
-% (\ref{eq:dhp2}), (\ref{eq:dhb}). Закон управления формируется на основе измерения
-% выходной переменной и не использует информацию о состоянии объекта,
-% что является его отличительной особенностью.
+Так как $\hat\varepsilon,\dot{\hat{\Psi}}_p$ стремятся к нулю асимптотически, а передаточная
+функция $1/K_M(s)$ устойчива, то из выражения (\ref{eq:heps3}) следует сходимость
+ошибки управления $\varepsilon$ к нулю асимптотически.
 
 
-% Важно отметить, что начальное условие $\hat{b}_m(0)$ в алгоритме (\ref{eq:dhb})
-% выбирается из условия $\hat{b}_m(0)\geq b_{\min}$.
-
-
-% \subsection{Способ №2 ($\boldsymbol{b_m}$ неизвестно)}
-% Закон управления формируется в виде:
-% \begin{align}
-%     u=\hat{\Psi}^T\omega\label{eq:u3}
-% \end{align}
-% Введем в рассмотрение сигнал расширенной ошибки:
-% \begin{align}
-%     \hat{\varepsilon}=\varepsilon+\hat{k}\xi,\label{eq:heps3}
-% \end{align}
-% где:
-% $$
-% \xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\bar{\omega},\ \omega=\left[ \nu_1^T,\nu_2^T,y,g \right],\ \bar{\omega}=\frac{1}{K_M(s)}\left[ \omega \right]
-% $$
-% Алгоритм адаптации примет следующий вид:
-% \begin{align}
-%     \dot{\hat{\Psi}}=\gamma_1\frac{\bar{\omega}}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
-%     \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon}\label{eq:dhk}
-% \end{align}
+Таким образом, для любых начальных условий $y(0),...,y^{(n-1)}(0),\hat{\Psi}_p(0)$
+закон адаптивного управления обеспечивает следующие свойства в
+замкнутой системе:
+\begin{itemize}
+    \item все сигналы в системе ограничены;
+    \item ошибка $\varepsilon$ стремится к нулю асимптотически;
+    \item параметрические ошибки $\tilde{\Psi}_p$ стремятся к нулю, если вектор $\bar{\omega}_p$
+    удовлетворяет условию неисчезающего возбуждения. Это условие
+    в конечном итоге зависит от частотной насыщенности сигнала задания $g$,
+    который должен содержать <<достаточное>> количество гармоник.
+\end{itemize}
 
 
 \section{Экспериментальная часть}
