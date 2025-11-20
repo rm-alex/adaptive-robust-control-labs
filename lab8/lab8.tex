@@ -225,22 +225,22 @@ $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
 % где $\hat{\Psi}$ -- вектор оценок $\Psi$, $\hat{b}_m$ -- оценка $b_m$.
 Введем в рассмотрение сигнал расширенной ошибки:
 \begin{align}
-    \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\overline{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
+    \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\bar{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
 \end{align}
 где:
-$$\omega_p=-\omega,\ \overline{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
+$$\omega_p=-\omega,\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
 Тогда, с учетом:
 \begin{align}
-    \varepsilon=\tilde{\Psi}_p^T\overline{\omega}_p+\hat{\Psi}_p^T\overline{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
+    \varepsilon=\tilde{\Psi}_p^T\bar{\omega}_p+\hat{\Psi}_p^T\bar{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
 \end{align}
 (\ref{eq:heps}) примет вид:
 \begin{align}
-    \hat{\varepsilon}=\tilde{\Psi}^T\overline{\omega}_p\label{eq:heps2}
+    \hat{\varepsilon}=\tilde{\Psi}^T\bar{\omega}_p\label{eq:heps2}
 \end{align}
 Выражение (\ref{eq:heps2}) представляет собой статическую модель ошибки, на
 базе которой строится алгоритм адаптации:
 \begin{align}
-    \dot{\hat{\Psi}}=\gamma\frac{\overline{\omega}_p}{1+\overline{\omega}_p^T\overline{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
+    \dot{\hat{\Psi}}=\gamma\frac{\bar{\omega}_p}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
 \end{align}
 
 
@@ -321,12 +321,12 @@ $$\omega_p=-\omega,\ \overline{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]
 \end{align}
 где:
 $$
-\xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\overline{\omega},\ \omega=\left[ \nu_1,\nu_2,y,g \right],\ \overline{\omega}\frac{1}{K_M(s)}\left[ \omega \right]
+\xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\bar{\omega},\ \omega^T=\left[ \nu_1^T,\nu_2^T,y,g \right],\ \bar{\omega}=\frac{1}{K_M(s)}\left[ \omega \right]
 $$
 Алгоритм адаптации примет следующий вид:
 \begin{align}
-    \dot{\hat{\Psi}}=\gamma_1\frac{\overline{\omega}}{1+\overline{\omega}^T\overline{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
-    \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\overline{\omega}^T\overline{\omega}}\hat{\varepsilon}\label{eq:dhk}
+    \dot{\hat{\Psi}}=\gamma_1\frac{\bar{\omega}}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
+    \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon}\label{eq:dhk}
 \end{align}
 
 
