@@ -128,54 +128,47 @@
 линейную модель объекта,
 представленную в форме <<вход-выход>>:
 \begin{align}
-    y^{(n)}+a_{n-1}y^{(n-1)}+a_{n-2}y^{(n-2)}+...+a_0y=b_mu^{(m)}+b_{m-1}u^{(m-1)}+...+b_0u,\label{eq:mpomio}
+    y^{(n)}+a_{n-1}y^{(n-1)}+...+a_0y=b_mu^{(m)}+b_{m-1}u^{(m-1)}+...+b_0u,\label{eq:mpomio}
 \end{align}
 где $a_i,i=\overline{0,n-1},b_j=\overline{0,m}$ -- неизвестные параметры объекта.
-Предполагается, что знак величины $b_m$ известен. Пусть в решаемой задаче
-$b_m\geq b_{\min}>0,b_{\min}$ -- известная величина.
+% Предполагается, что знак величины $b_m$ известен. Пусть в решаемой задаче
+% $b_m\geq b_{\min}>0,b_{\min}$ -- известная величина.
 
 
-Вместе с моделью рассмотрим динамические фильтры:
-\begin{align}
-    \dot{\nu}_1=\Lambda \nu_1+e_{n-1}u,\label{eq:dv1}\\
-    \dot{\nu}_2=\Lambda \nu_2+e_{n-1}y,\label{eq:dv2}
-\end{align}
-где $\nu_1,\nu_2\in\mathbb{R}^{n-1}$ -- векторы состояния фильтров,
-$e_{n-1}=\operatorname{col}(0,...,0,1),e_{n-1}\in\mathbb{R}^{n-1}$,
-$$
-\Lambda=\begin{bmatrix}
-    0&1&0&...&0\\
-    0&0&1&...&0\\
-    \vdots&\vdots&\vdots&\ddots&\vdots\\
-    0&0&0&...&1\\
-    -k_0&-k_1&-k_2&...&-k_{n-2}
-\end{bmatrix}
-$$
-Матрица $\Lambda$ имеет сопровождающий полином:
-$$
-K(s)=s^{n-1}+k_{n-2}s^{n-2}+k_{n-3}s^{n-3}+...+k_0
-$$
-Для любых нормированных устойчивых полиномов
-$K(s),K_M(s)$ степени $n-1,n-m$ соответственно
-существует единственный постоянный вектор
-$\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
-параметров объекта, такой, что объект (\ref{eq:mpomio})
-может быть представлен в виде:
-\begin{align}
-    y(t)=\frac{1}{K_M(s)}\left[ \Psi^T\omega(t)+b_mu(t) \right]+\delta(t),\label{eq:yt}
-\end{align}
-где $\omega^T=\left[ \nu_1^T,\nu_2^T,y \right],\delta(t)$ --
-экспоненциально затухающая функция,
-определяемая ненулевыми начальными условиями.
+% Вместе с моделью рассмотрим динамические фильтры:
+% \begin{align}
+%     \dot{\nu}_1=\Lambda \nu_1+e_{n-1}u,\label{eq:dv1}\\
+%     \dot{\nu}_2=\Lambda \nu_2+e_{n-1}y,\label{eq:dv2}
+% \end{align}
+% где $\nu_1,\nu_2\in\mathbb{R}^{n-1}$ -- векторы состояния фильтров,
+% $e_{n-1}=\operatorname{col}(0,...,0,1),e_{n-1}\in\mathbb{R}^{n-1}$,
+% $$
+% \Lambda=\begin{bmatrix}
+%     0&1&0&...&0\\
+%     0&0&1&...&0\\
+%     \vdots&\vdots&\vdots&\ddots&\vdots\\
+%     0&0&0&...&1\\
+%     -k_0&-k_1&-k_2&...&-k_{n-2}
+% \end{bmatrix}
+% $$
+% Матрица $\Lambda$ имеет сопровождающий полином:
+% $$
+% K(s)=s^{n-1}+k_{n-2}s^{n-2}+k_{n-3}s^{n-3}+...+k_0
+% $$
+% Для любых нормированных устойчивых полиномов
+% $K(s),K_M(s)$ степени $n-1,n-m$ соответственно
+% существует единственный постоянный вектор
+% $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
+% параметров объекта, такой, что объект (\ref{eq:mpomio})
+% может быть представлен в виде:
+
+% Параметризованное представление (\ref{eq:yt}) позволяет синтезировать
+% управление, компенсирующее неопределенности модели, сосредоточенные
+% в векторе $\Psi$.
 
 
-Параметризованное представление (\ref{eq:yt}) позволяет синтезировать
-управление, компенсирующее неопределенности модели, сосредоточенные
-в векторе $\Psi$.
-
-
-Рассмотрим задачу
-слежения выходной переменной $y$ за эталонным сигналом $y_M$,
+Задача --
+слежение выходной переменной $y$ за эталонным сигналом $y_M$,
 формируемым эталонной моделью вида:
 \begin{align}
     y_M(t)=\frac{k_0}{K_M(s)}\left[ g(t) \right],\label{eq:ym}
@@ -198,6 +191,15 @@ $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
 
 
 \section{Теоретическая часть}
+Для синтеза адаптивного регулятора используется параметризованное
+представление выхода объекта:
+\begin{align}
+    y(t)=\frac{1}{K_M(s)}\left[ \Psi^T\omega(t)+b_mu(t) \right]+\delta(t),\label{eq:yt}
+\end{align}
+где $\omega^T=\left[ \nu_1^T,\nu_2^T,y \right],\delta(t)$ --
+экспоненциально затухающая функция,
+определяемая ненулевыми начальными условиями.
+
 % Для решения задачи сформируем ошибку управления по выходу $\varepsilon=y_M-y$
 % и с учетом (\ref{eq:yt}), (\ref{eq:ym}), проведем простейшие преобразования:
 % \begin{align*}
@@ -214,34 +216,34 @@ $\Psi\in\mathbb{R}^{2n-1}$, зависящий от неизвестных
 
 % Выражение (\ref{eq:eps}) позволяет сформировать компенсирующий закон
 % управления вида:
-\subsection{Способ №1 ($\boldsymbol{b_m}$ известно)}
-Закон управления формируется в виде
-\begin{align}
-    u=\frac{1}{b_m}\left( \hat{\Psi}^T\omega_p+k_0g \right)\label{eq:u}
-\end{align}
+% \subsection{Способ №1 ($\boldsymbol{b_m}$ известно)}
+% Закон управления формируется в виде
+% \begin{align}
+%     u=\frac{1}{b_m}\left( \hat{\Psi}^T\omega_p+k_0g \right)\label{eq:u}
+% \end{align}
 % \begin{align}
 %     u=\frac{1}{\hat{b}_m}\left( -\hat{\Psi}^T\omega_p+k_0g \right),\label{eq:u2}
 % \end{align}
 % где $\hat{\Psi}$ -- вектор оценок $\Psi$, $\hat{b}_m$ -- оценка $b_m$.
-Введем в рассмотрение сигнал расширенной ошибки:
-\begin{align}
-    \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\bar{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
-\end{align}
-где:
-$$\omega_p=-\omega,\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
-Тогда, с учетом:
-\begin{align}
-    \varepsilon=\tilde{\Psi}_p^T\bar{\omega}_p+\hat{\Psi}_p^T\bar{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
-\end{align}
-(\ref{eq:heps}) примет вид:
-\begin{align}
-    \hat{\varepsilon}=\tilde{\Psi}^T\bar{\omega}_p\label{eq:heps2}
-\end{align}
-Выражение (\ref{eq:heps2}) представляет собой статическую модель ошибки, на
-базе которой строится алгоритм адаптации:
-\begin{align}
-    \dot{\hat{\Psi}}=\gamma\frac{\bar{\omega}_p}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
-\end{align}
+% Введем в рассмотрение сигнал расширенной ошибки:
+% \begin{align}
+%     \hat{\varepsilon}=\varepsilon-\hat{\Psi}^T\bar{\omega}_p+\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega_p \right],\label{eq:heps}
+% \end{align}
+% где:
+% $$\omega_p=-\omega,\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
+% Тогда, с учетом:
+% \begin{align}
+%     \varepsilon=\tilde{\Psi}_p^T\bar{\omega}_p+\hat{\Psi}_p^T\bar{\omega}_p-\frac{1}{K_M(s)}\left[ \hat{\Psi}_p^T\omega_p \right]\label{eq:eps3}
+% \end{align}
+% (\ref{eq:heps}) примет вид:
+% \begin{align}
+%     \hat{\varepsilon}=\tilde{\Psi}^T\bar{\omega}_p\label{eq:heps2}
+% \end{align}
+% Выражение (\ref{eq:heps2}) представляет собой статическую модель ошибки, на
+% базе которой строится алгоритм адаптации:
+% \begin{align}
+%     \dot{\hat{\Psi}}=\gamma\frac{\bar{\omega}_p}{1+\bar{\omega}_p^T\bar{\omega}_p}\hat{\varepsilon}\label{eq:dhpsi}
+% \end{align}
 
 
 % С целью предотвращения деления на ноль в законе
@@ -310,31 +312,34 @@ $$\omega_p=-\omega,\ \bar{\omega}_p=\frac{1}{K_M(s)}\left[ \omega_p \right]$$
 % выбирается из условия $\hat{b}_m(0)\geq b_{\min}$.
 
 
-\subsection{Способ №2 ($\boldsymbol{b_m}$ неизвестно)}
-Закон управления формируется в виде:
-\begin{align}
-    u=\hat{\Psi}^T\omega\label{eq:u3}
-\end{align}
-Введем в рассмотрение сигнал расширенной ошибки:
-\begin{align}
-    \hat{\varepsilon}=\varepsilon+\hat{k}\xi,\label{eq:heps3}
-\end{align}
-где:
-$$
-\xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\bar{\omega},\ \omega^T=\left[ \nu_1^T,\nu_2^T,y,g \right],\ \bar{\omega}=\frac{1}{K_M(s)}\left[ \omega \right]
-$$
-Алгоритм адаптации примет следующий вид:
-\begin{align}
-    \dot{\hat{\Psi}}=\gamma_1\frac{\bar{\omega}}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
-    \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon}\label{eq:dhk}
-\end{align}
+% \subsection{Способ №2 ($\boldsymbol{b_m}$ неизвестно)}
+% Закон управления формируется в виде:
+% \begin{align}
+%     u=\hat{\Psi}^T\omega\label{eq:u3}
+% \end{align}
+% Введем в рассмотрение сигнал расширенной ошибки:
+% \begin{align}
+%     \hat{\varepsilon}=\varepsilon+\hat{k}\xi,\label{eq:heps3}
+% \end{align}
+% где:
+% $$
+% \xi=\frac{1}{K_M(s)}\left[ \hat{\Psi}^T\omega \right]-\hat{\Psi}^T\bar{\omega},\ \omega=\left[ \nu_1^T,\nu_2^T,y,g \right],\ \bar{\omega}=\frac{1}{K_M(s)}\left[ \omega \right]
+% $$
+% Алгоритм адаптации примет следующий вид:
+% \begin{align}
+%     \dot{\hat{\Psi}}=\gamma_1\frac{\bar{\omega}}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon},\label{eq:dhpsi2}\\
+%     \dot{\hat{k}}=-\gamma_2\frac{\xi}{1+\bar{\omega}^T\bar{\omega}}\hat{\varepsilon}\label{eq:dhk}
+% \end{align}
 
 
 \section{Экспериментальная часть}
 \subsection{Параметры системы}
 Согласно варианту 21, исходные данные:
 $$
-a_0=9,\ a_1=6,\ b_0=9,\ k_{M,1}=6,\ k_{M,0}=9,\ k_0=1,\ g(t)=0.4\sin{3t}+\cos{0.1t}
+a_0=9,\ a_1=6,\ b_0=9,\ k_{M,1}=6,\ k_{M,0}=9,\ k_0=1,
+$$
+$$
+g(t)=0.4\sin{3t}+\cos{0.1t}
 $$
 
 
