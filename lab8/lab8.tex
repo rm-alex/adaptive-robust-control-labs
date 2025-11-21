@@ -318,8 +318,8 @@ $$
 \subsection{Стабилизирующее адаптивное управление}
 Построим стабилизирующее адаптивное управление $(g(t)=0)$,
 $m=0,\hat{b}_m\equiv\hat{b}_0,b_m\equiv b_0$ на основе
-фильтров (\ref{eq:dv1},\ref{eq:dv2}), настраиваемого
-регулятора (\ref{eq:u}), алгоритма адаптации (\ref{eq:dhp2},\ref{eq:dhbm}),
+фильтров (\ref{eq:dv1}), (\ref{eq:dv2}), настраиваемого
+регулятора (\ref{eq:u}), алгоритма адаптации (\ref{eq:dhp2}), (\ref{eq:dhbm}),
 расширенной ошибки (\ref{eq:heps}) и исходных данных. Начальное
 условие в алгоритме адаптации $\hat{b}_m(0)>b_0$.
 
@@ -331,8 +331,283 @@ $m=0,\hat{b}_m\equiv\hat{b}_0,b_m\equiv b_0$ на основе
     \caption{Схема моделирования}
     \label{fig:sch}
 \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{sybs.png}
+    \caption{Подсистема схемы моделирования}
+    \label{fig:sybs}
+\end{figure}
+
+
+Программы, используемые в схеме:
+\begin{lstlisting}[label=code1, caption={Код матлаб-функции}]
+function [u,nu_dot_1,nu_dot_2,omega,theta_phi, ...
+    psi_hat_dot,b0_hat_dot] = fcn(y,e,g,u_bar, ...
+    nu_1, nu_2,omega_bar,theta_phi_bar,...
+    psi_hat,b0_hat,k0, bmin)
+Lambda = -k0;
+omega = [nu_1', nu_2', y]';
+
+u = (-psi_hat'*omega + k0*g)/b0_hat;
+nu_dot_1 = Lambda*nu_1 + u;
+nu_dot_2 = Lambda*nu_2 + y;
+
+theta_hat = [psi_hat; b0_hat];
+omega_bar_p = [-omega_bar; -u_bar];
+omega_p = [-omega; -u];
+theta_phi = theta_hat'*omega_p;
+e_hat = e - theta_hat'*omega_bar_p + theta_phi_bar;
+
+gamma1 = 100;
+gamma2 = 1;
+psi_hat_dot = -gamma1*omega_bar / ...
+    (1 + omega_bar'*omega_bar)*e_hat;
+b0_hat_dot = 10;
+if b0_hat >= bmin
+    b0_hat_dot = -gamma2*u_bar / ...
+        (1 + omega_bar'*omega_bar)*e_hat;
+elseif b0_hat < bmin
+    b0_hat_dot = 0;
+end
+\end{lstlisting}
+
+
+\begin{lstlisting}[label=code2, caption={Исходные данные схемы}]
+a0=9;
+a1=6;
+b0=9;
+bmin=1;
+km1=6;
+km0=9;
+k0=1;
+\end{lstlisting}
+
+
+\begin{lstlisting}[label=code3, caption={Начальные значения интеграторов $\dot{\hat{\Psi}},\dot{\nu}_i,\dot{\hat{b}}_0$}]
+set_param('sim1/phd_int','InitialCondition','[0.5;0.5;0.5]');
+set_param('sim1/nd1_int','InitialCondition','0.5');
+set_param('sim1/nd2_int','InitialCondition','0.5');
+set_param('sim1/bhd_int','InitialCondition','10');
+set_param('sim1', 'StopTime', '15.0');
+\end{lstlisting}
+
+
+Промоделируем систему (\ref{fig:sch}) при $g(t)=0$ и начальных значениях,
+представленных на листинге (\ref{code3}), для различных $\gamma_1\gg \gamma_2$:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_y_1000_1.png}
+    \caption{Выход системы $y(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:1_y_1000_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_u_1000_1.png}
+    \caption{Управление $u(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:1_u_1000_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_p_1000_1.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:1_p_1000_1}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_y_10000_10.png}
+    \caption{Выход системы $y(t)$ при $\gamma_1=10000,\gamma_2=10$}
+    \label{fig:1_y_10000_10}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_u_10000_10.png}
+    \caption{Управление $u(t)$ при $\gamma_1=10000,\gamma_2=10$}
+    \label{fig:1_u_10000_10}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_p_10000_10.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=10000,\gamma_2=10$}
+    \label{fig:1_p_10000_10}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_y_100000_100.png}
+    \caption{Выход системы $y(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:1_y_100000_100}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_u_100000_100.png}
+    \caption{Управление $u(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:1_u_100000_100}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{1_p_100000_100.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:1_p_100000_100}
+\end{figure}
+
+
+При увеличении коэффициентов $\gamma_i$ выход системы
+быстрее сходится к нулю.
+
+
+Оценки параметров не сходятся к истинным значениям, так как
+условие неисчезающего возбуждения для $\bar{\omega}_p$ при $g(t)=0$ не выполняется.
+
+
+\subsection{Следящий адаптивный регулятор: устойчивая система}
+На основе эталонной модели (\ref{eq:ym}), фильтров (\ref{eq:dv1}), (\ref{eq:dv2}),
+настраиваемого регулятора (\ref{eq:u}), алгоритма адаптации (\ref{eq:dhpp}) и исходных данных,
+построим следящий адаптивный
+регулятор.
+
+
+Используемые в схеме программы:
+\begin{lstlisting}[label=code, caption={Матлаб-функция задающего воздействия}]
+function g = set_signal(t)
+g = 0.4*sin(3*t)+cos(0.1*t);
+\end{lstlisting}
+
+
+Промоделируем систему (\ref{fig:sch}) при $g(t)\neq0$, $\dot{\hat{\Psi}}(0)=\left[ 0;0;0 \right]$,
+$\dot{\nu}_i(0)=0$, $\dot{\hat{b}}_0(0)=10$ для различных $\gamma_1\gg \gamma_2$:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_y_100000_100.png}
+    \caption{Выход сигнала $y_M(t)$ и системы $y(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:2_y_100000_100}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_u_100000_100.png}
+    \caption{Управление $u(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:2_u_100000_100}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{2_p_100000_100.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=100000,\gamma_2=100$}
+    \label{fig:2_p_100000_100}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_y_1000000_1000.png}
+    \caption{Выход сигнала $y_M(t)$ и системы $y(t)$ при $\gamma_1=1000000,\gamma_2=1000$}
+    \label{fig:2_y_1000000_1000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_u_1000000_1000.png}
+    \caption{Управление $u(t)$ при $\gamma_1=1000000,\gamma_2=1000$}
+    \label{fig:2_u_1000000_1000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{2_p_1000000_1000.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=1000000,\gamma_2=1000$}
+    \label{fig:2_p_1000000_1000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{2_p_1000000_1000_close.png}
+    \caption{Оценки параметров $\hat{\Psi}(t)$ вблизи при $\gamma_1=1000000,\gamma_2=1000$}
+    \label{fig:2_p_1000000_1000_close}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_y_5000000_5000.png}
+    \caption{Выход сигнала $y_M(t)$ и системы $y(t)$ при $\gamma_1=5000000,\gamma_2=5000$}
+    \label{fig:2_y_5000000_5000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{2_u_5000000_5000.png}
+    \caption{Управление $u(t)$ при $\gamma_1=5000000,\gamma_2=5000$}
+    \label{fig:2_u_5000000_5000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{2_p_5000000_5000.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=5000000,\gamma_2=5000$}
+    \label{fig:2_p_5000000_5000}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{2_p_5000000_5000_close.png}
+    \caption{Оценки параметров $\hat{\Psi}(t)$ вблизи при $\gamma_1=5000000,\gamma_2=5000$}
+    \label{fig:2_p_5000000_5000_close}
+\end{figure}
+
+
+Чем больше $\gamma_i$, тем быстрее выход системы
+сходится к желаемому сигналу, быстрее происходит адаптация параметров.
+
+
+Оценки параметров сходятся к истинным значениям, так как
+условие неисчезающего возбуждения для $\bar{\omega}_p$
+выполняется.
+
+
+\subsection{Следящий адаптивный регулятор: неустойчивая система}
+Выберем коэффициенты модели объекта $a_i$ с обратным знаком:
+$$
+a_1=-6,\ a_0=-9
+$$
+
+
+Проведем моделирование системы (\ref{fig:sch}) при
+таких же начальных условиях, как и в предыдущем пункте,
+для одной пары $\gamma_1,\gamma_2$:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{3_y_1000_1.png}
+    \caption{Выход сигнала $y_M(t)$ и системы $y(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:3_y_1000_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{3_u_1000_1.png}
+    \caption{Управление $u(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:3_u_1000_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{3_p_1000_1.png}
+    \caption{Оценки параметров $\hat{\Psi}_p(t)$ при $\gamma_1=1000,\gamma_2=1$}
+    \label{fig:3_p_1000_1}
+\end{figure}
+
+
+Управления стало затрачиваться значительно больше,
+в системе присутствует перерегулирование.
+
+
+Оценки параметров не сходятся к истинным значениям.
 
 
 \section{Вывод}
-...
+В ходе выполнения данной лабораторной
+работы был синтезирован следящий адаптивный регулятор
+на основе метода расширенной ошибки.
+В случае устойчивого объекта и при выполнении
+условия неисчезающего возбуждения оценки
+параметров сошлись к истинным значениям.
+Было проведено исследование влияния параметров
+$\gamma_1,\gamma_2:\gamma_1\gg \gamma_2$ на работу адаптивного алгоритма.
+Чем больше их значения, тем быстрее адаптация параметров
+и схождение выхода системы к эталонному сигналу.
+В случае неустойчивого объекта или при невыполнении
+условия неисчезающего возбуждения оценки параметров
+не сошлись к истинным значениям.
 \end{document}
